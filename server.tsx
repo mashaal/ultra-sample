@@ -3,8 +3,7 @@ import { createRouter, createServer } from "ultra/server.ts";
 import App from "./src/app.tsx";
 
 // Twind
-import { sheet, TwindProvider } from "create-ultra-app/twind";
-import "./twind.ts";
+import { ThemeProvider } from "./src/theme.tsx";
 
 // Wouter
 import { Router } from "wouter";
@@ -19,13 +18,14 @@ const helmetContext: Record<string, any> = {};
 
 // React Query
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./queryClient.ts";
+import { queryClient } from "./src/queryClient.ts";
 
 // tRPC
 import { useState } from "react";
 import { trpc } from "./src/trpc/client.ts";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "./src/trpc/router.ts";
+import { useDehydrateReactQuery } from "./src/hooks/useDehydrateReactQuery.tsx";
 
 const server = await createServer({
   importMapPath: import.meta.resolve("./importMap.json"),
@@ -33,6 +33,7 @@ const server = await createServer({
 });
 
 function ServerApp({ context }: any) {
+  useDehydrateReactQuery(queryClient);
   const [queryClientTrpc] = useState(queryClient);
   const [trpcClient] = useState(() =>
     trpc.createClient({
@@ -59,13 +60,13 @@ function ServerApp({ context }: any) {
     <HelmetProvider context={helmetContext}>
       <trpc.Provider client={trpcClient} queryClient={queryClientTrpc}>
         <QueryClientProvider client={queryClientTrpc}>
-          <TwindProvider sheet={sheet}>
+          <ThemeProvider >
             <Router hook={staticLocationHook(requestUrl.pathname)}>
               <SearchParamsProvider value={requestUrl.searchParams}>
                 <App />
               </SearchParamsProvider>
             </Router>
-          </TwindProvider>
+          </ThemeProvider>
         </QueryClientProvider>
       </trpc.Provider>
     </HelmetProvider>

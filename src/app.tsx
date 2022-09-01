@@ -3,8 +3,10 @@ import About from "./pages/About.tsx";
 import Home from "./pages/Home.tsx";
 import { Link, Route, Switch } from "wouter";
 
+
 export default function App() {
   return (
+
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
